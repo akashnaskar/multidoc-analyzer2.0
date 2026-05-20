@@ -474,10 +474,10 @@ class DocumentComparator:
         
     def clean_old_sessions(self, keep_latest: int =3):
         try:
-            sessions = sorted([f for f in self.base_dir.iterdir() if f.is_dir()], reverse= True)
-            for folder in sessions[keep_latest]:
-                shutil.rmtree(folder, ignore_errors= True)
-                log.info("Old session folders deleted", path= str(folder))
+            sessions = sorted([f for f in self.base_dir.iterdir() if f.is_dir()], reverse=True)
+            for folder in sessions[keep_latest:]:
+                shutil.rmtree(folder, ignore_errors=True)
+                self.log.info("Old session folder deleted", path=str(folder))
         except Exception as e:
-            log.error("Error cleaning old sessions", error=str(e))
+            self.log.error("Error cleaning old sessions", error=str(e))
             raise DocumentPortalException("Error cleaning old sessions", e) from e
