@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
 from typing import Iterable, List
+from fastapi import UploadFile
 from langchain.schema import Document
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 from multidocchat.logger import GLOBAL_LOGGER as log
@@ -41,3 +42,19 @@ def concat_for_comparison(ref_docs: List[Document], act_docs: List[Document])-> 
     left = concat_for_analysis(ref_docs)
     right = concat_for_analysis(act_docs)
     return f"<<REFERENCE_DOCUMENTS>>\n{left}\n\n<<ACTUAL_DOCUMENTS>>\n{right}"
+
+class FastAPIFileAdapter:
+    def __init__(self, uf:UploadFile):
+        self._uf = uf
+        self.name = uf.filename
+
+    def getbuffer(self)-> bytes:
+        self._uf.file.seek(0)
+        return self._uf.file.read()
+    
+def read_pdf_via_handler(handler, path: str)-> str:
+    if hasattr(handler, "read_pdf"):
+        return handler.read_pdf(path)
+    if hasattr(handler, "read_"):
+        return handler.read_(path)
+    raise RuntimeError("DocHandler has neither read__pdf nor read_method")

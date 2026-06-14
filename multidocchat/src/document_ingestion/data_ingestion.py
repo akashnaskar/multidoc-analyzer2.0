@@ -162,8 +162,8 @@ class DocHandler:
     save + read PDF for analysis
     """
     def __init__(self, data_dir: Optional[str]=None, session_id: Optional[str]= None):
-        self.data_dir = data_dir
-        self.session_id = session_id or os.getenv("DATA_STORAGE_PATH", os.path.join(os.getcwd(),"data", "document_analysis" ))
+        self.data_dir = data_dir or os.getenv("DATA_STORAGE_PATH", os.path.join(os.getcwd(), "data", "document_analysis"))
+        self.session_id = session_id or generate_session_id()
         self.session_path= os.path.join(self.data_dir, self.session_id)
         os.makedirs(self.session_path, exist_ok=True)
         log.info("DocHandler initialized", session_id= self.session_id, session_path=self.session_path)
@@ -252,9 +252,9 @@ class DocHandler:
         
 
     def _read_docx(self, path: str)-> str:
-        import doc2txt
+        import docx2txt
         try:
-            text = doc2txt.process(path) or ""
+            text = docx2txt.process(path) or ""
             log.info("DOCX read succesfully", file_path= path)
             return text
         except Exception as e:
